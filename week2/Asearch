@@ -1,0 +1,44 @@
+from heapq import heappush, heappop
+
+def heuristic(a, b, target):
+    return abs(a - target) + abs(b - target)
+
+def astar_jug(cap1, cap2, target):
+    visited = set()
+    pq = []
+
+    heappush(pq, (0, 0, 0, []))  # (f, x, y, path)
+
+    while pq:
+        f, x, y, path = heappop(pq)
+
+        if (x, y) in visited:
+            continue
+        visited.add((x, y))
+
+        path = path + [(x, y)]
+
+        if x == target or y == target:
+            return path
+
+        moves = [
+            (cap1, y),          
+            (x, cap2),         
+            (0, y),            
+            (x, 0),            
+            (max(0, x-(cap2-y)), min(cap2, y+x)),  
+            (min(cap1, x+y), max(0, y-(cap1-x)))   
+        ]
+
+        for nx, ny in moves:
+            if (nx, ny) not in visited:
+                g = len(path)
+                h = heuristic(nx, ny, target)
+                heappush(pq, (g + h, nx, ny, path))
+
+    return "No solution"
+
+
+result = astar_jug(4, 3, 2)
+for step in result:
+    print(step)
