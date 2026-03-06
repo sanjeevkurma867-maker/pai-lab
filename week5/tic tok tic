@@ -1,0 +1,119 @@
+import math
+
+board = [' ' for _ in range(9)]
+
+human = 'O'
+ai = 'X'
+
+
+def print_board():
+    print()
+    print(board[0], "|", board[1], "|", board[2])
+    print("--+---+--")
+    print(board[3], "|", board[4], "|", board[5])
+    print("--+---+--")
+    print(board[6], "|", board[7], "|", board[8])
+    print()
+
+
+def check_winner(b, player):
+    win_positions = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ]
+
+    for pos in win_positions:
+        if b[pos[0]] == b[pos[1]] == b[pos[2]] == player:
+            return True
+    return False
+
+
+def is_full(b):
+    return ' ' not in b
+
+
+def minimax(b, is_max):
+
+    if check_winner(b, ai):
+        return 1
+    if check_winner(b, human):
+        return -1
+    if is_full(b):
+        return 0
+
+    if is_max:
+        best = -math.inf
+        for i in range(9):
+            if b[i] == ' ':
+                b[i] = ai
+                score = minimax(b, False)
+                b[i] = ' '
+                best = max(best, score)
+        return best
+
+    else:
+        best = math.inf
+        for i in range(9):
+            if b[i] == ' ':
+                b[i] = human
+                score = minimax(b, True)
+                b[i] = ' '
+                best = min(best, score)
+        return best
+
+
+def ai_move():
+    best_score = -math.inf
+    move = -1
+
+    for i in range(9):
+        if board[i] == ' ':
+            board[i] = ai
+            score = minimax(board, False)
+            board[i] = ' '
+            if score > best_score:
+                best_score = score
+                move = i
+
+    board[move] = ai
+
+
+def human_move():
+    while True:
+        pos = int(input("Enter position (1-9): ")) - 1
+        if board[pos] == ' ':
+            board[pos] = human
+            break
+        else:
+            print("Position already taken!")
+
+
+print("You are O, Computer is X")
+
+while True:
+
+    print_board()
+    human_move()
+
+    if check_winner(board, human):
+        print_board()
+        print("You win!")
+        break
+
+    if is_full(board):
+        print_board()
+        print("Draw!")
+        break
+
+    ai_move()
+
+    if check_winner(board, ai):
+        print_board()
+        print("Computer wins!")
+        break
+
+    if is_full(board):
+        print_board()
+        print("Draw!")
+        break
